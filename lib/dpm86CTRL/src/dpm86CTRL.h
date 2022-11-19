@@ -1,16 +1,17 @@
-#ifndef dpm86CTRL_h
-#define dpm86CTRL_h
+#ifndef __dpm86CTRL_h__
+#define __dpm86CTRL_h__
 
-#include "Arduino.h"
+#include <Arduino.h>
 #include "dpm86config.h"
-#include <HardwareSerial.h>
-#include <SoftwareSerial.h>
+//#include <HardwareSerial.h>
+//#include <SoftwareSerial.h>
 
 class dpm86CTRL {
   public:
 
       dpm86CTRL(HardwareSerial * SerialConnection); // ;
-      void begin(uint32_t baud);
+      void init();
+      //void begin(uint32_t baud);
       //void receive();
       int setVoltage(int _voltage);
       //int getValue(int _IncomeValue);

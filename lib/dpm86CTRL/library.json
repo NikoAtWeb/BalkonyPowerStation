@@ -1,0 +1,17 @@
+{
+	"name": "dpm86CTRL",
+	"version": "1.0",
+	"keywords": "bus",
+	"description": "To be definded",
+	"repository": {
+		"type": "git",
+		"url": ""
+	},
+	"build": {
+		"includeDir": "."
+	},
+	"license": "MIT",
+	"homepage": "https://lvgl.io",
+	"frameworks": "*",
+	"platforms": "*"
+}
