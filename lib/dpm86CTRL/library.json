@@ -11,7 +11,7 @@
 		"includeDir": "."
 	},
 	"license": "MIT",
-	"homepage": "https://lvgl.io",
+	"homepage": "",
 	"frameworks": "*",
 	"platforms": "*"
 }
