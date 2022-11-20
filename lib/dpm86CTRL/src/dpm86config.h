@@ -14,10 +14,18 @@
 #define debugSerial Serial
 
 /**
- * Define dpmSerial for communicate with dpm86xxx. 
+ * Define dpmSerial for communicate with dpm86xxx in HardwareSerial or SoftwareSerial. 
+ * Comment following define
  */
-#define dpmSerial Serial2
+//#define HARDWARE_SERIAL_ENABLE
 
+#ifdef HARDWARE_SERIAL_ENABLE
+    #define dpmSerialHard Serial2
+#else
+    #include <SoftwareSerial.h>
+    extern SoftwareSerial SoftSerial;
+    #define dpmSerialSoft SoftSerial
+#endif
 
 #ifdef DEBUG_SERIAL_ENABLE
     #define debugSerialPrint(a)    debugSerial.print(a)

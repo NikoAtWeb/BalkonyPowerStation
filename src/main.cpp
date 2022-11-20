@@ -1,15 +1,17 @@
 #include <Arduino.h>
 //#include <Esp.h> // ESP Integration
-#include <SoftwareSerial.h>
-//#include "dpm86CTRL.h"
+//#include <SoftwareSerial.h>
+#include "dpm86CTRL.h"
 
-SoftwareSerial mySerial(2,3); // Rx = 2; Tx = 3
+SoftwareSerial SoftSerial(2,3); // Rx = 2; Tx = 3
 
+dpm86CTRL DPM;
 
 void setup() {
   Serial.begin(9600);//(115200);
-  mySerial.begin(9600);
-  //Serial2.begin(9600);
+  //SoftSerial.begin(9600);
+  
+  DPM.init();
 }
 
 void loop() {
@@ -18,39 +20,32 @@ void loop() {
   Serial.print(":01w10=1200.\n"); //command address write volt = 12 fastresponse end
   Serial.println();
   // Serial2
-  mySerial.write(":01w10=1200.\n"); //command address write volt = 12 fastresponse end
+  SoftSerial.write(":01w10=1200.\n"); //command address write volt = 12 fastresponse end
 
   delay(1000);
 
   Serial.print("Communication(2): ");
-  Serial.print(":01w10=1200,\n"); //command address write volt = 12 fastresponse end
+  Serial.print(":01w10=1000.\n"); //command address write volt = 12 fastresponse end
   Serial.println();
   // Serial2
-  mySerial.write(":01w10=1200,\n"); //command address write volt = 12 fastresponse end
+  SoftSerial.write(":01w10=1000.\n"); //command address write volt = 12 fastresponse end
 
   delay(1000);
 
   Serial.print("Communication(3): ");
-  Serial.print(":01w10=1200,\r\n"); //command address write volt = 12 fastresponse end
+  Serial.print(":01w10=600.\n"); //command address write volt = 12 fastresponse end
   Serial.println();
   // Serial2
-  mySerial.write(":01w10=1200,\r\n"); //command address write volt = 12 fastresponse end
+  SoftSerial.write(":01w10=600.\n"); //command address write volt = 12 fastresponse end
 
   delay(1000);
 
   Serial.print("Communication(4): ");
-  Serial.print(":01w10=1200,\r\n"); //command address write volt = 12 fastresponse end
+  Serial.print("5V Over Libary"); //command address write volt = 12 fastresponse end
   Serial.println();
-  // Serial2
-  mySerial.write(':01w10=1200,\r\n'); //command address write volt = 12 fastresponse end
-
-  delay(1000);
   
-  Serial.print("Communication(5): ");
-  Serial.print(":01w10=1200.\n"); //command address write volt = 12 fastresponse end
-  Serial.println();
-  // Serial2
-  mySerial.print(":01w10=1200.\n"); //command address write volt = 12 fastresponse end
+  DPM.loop(); 
+  DPM.setVoltage(5);
 
   delay(1000);
 }
