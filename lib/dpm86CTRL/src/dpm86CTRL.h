@@ -11,15 +11,18 @@ class dpm86CTRL {
 
       //dpm86CTRL(HardwareSerial * SerialConnection); // ;
       dpm86CTRL();
-      void init();
+      void init(); // without PIN definition for SERIAL
+      void setup(int _RxPin, int _TxPin); // with SoftSerial PIN definition
       void loop();
       void setVoltage(int _voltage);
-      void sendOUT();
+      void sendOUT(int _voltage);
 
   private:
 
     int _voltage;
     int _addr;
+    int _RxPin;
+    int _TxPin;
     String  _cmd, _v, _sendOut;
 };
 
