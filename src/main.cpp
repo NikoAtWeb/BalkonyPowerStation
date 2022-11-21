@@ -7,11 +7,12 @@ SoftwareSerial SoftSerial(2,3); // Rx = 2; Tx = 3
 
 dpm86CTRL DPM;
 
+//DPM.setup(2,3);
+
 void setup() {
   Serial.begin(9600);//(115200);
-  //SoftSerial.begin(9600);
-  
-  DPM.init();
+  DPM.setup(7); // define Pins here
+  DPM.begin();  // start Serial connection
 }
 
 void loop() {
