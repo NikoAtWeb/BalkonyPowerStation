@@ -3,49 +3,41 @@
 //#include <SoftwareSerial.h>
 #include "dpm86CTRL.h"
 
-SoftwareSerial SoftSerial(2,3); // Rx = 2; Tx = 3
+// ++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+SoftwareSerial SoftSerial(2,3); // Rx = 2; Tx = 3
 dpm86CTRL DPM;
+
+// ++++++++++++++++++++++++++++++++++++++++++++++++++++
+// Variables
+
+int cnt = 5;
+
+// ++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+//DPM.setup(2,3);
 
 void setup() {
   Serial.begin(9600);//(115200);
-  //SoftSerial.begin(9600);
-  
-  DPM.init();
+  DPM.setup(7); // define Pins here
+  DPM.begin();  // start Serial connection
 }
 
 void loop() {
+ 
+ if (cnt >=12)
+ {
+    cnt = 5; 
+ }
+ 
+  delay(2000);
 
-  Serial.print("Communication(1): ");
-  Serial.print(":01w10=1200.\n"); //command address write volt = 12 fastresponse end
-  Serial.println();
-  // Serial2
-  SoftSerial.write(":01w10=1200.\n"); //command address write volt = 12 fastresponse end
-
-  delay(1000);
-
-  Serial.print("Communication(2): ");
-  Serial.print(":01w10=1000.\n"); //command address write volt = 12 fastresponse end
-  Serial.println();
-  // Serial2
-  SoftSerial.write(":01w10=1000.\n"); //command address write volt = 12 fastresponse end
-
-  delay(1000);
-
-  Serial.print("Communication(3): ");
-  Serial.print(":01w10=600.\n"); //command address write volt = 12 fastresponse end
-  Serial.println();
-  // Serial2
-  SoftSerial.write(":01w10=600.\n"); //command address write volt = 12 fastresponse end
-
-  delay(1000);
-
-  Serial.print("Communication(4): ");
-  Serial.print("5V Over Libary"); //command address write volt = 12 fastresponse end
+  Serial.print("Communication: ");
+  Serial.print("Set Voltage Over Libary"); //command address write volt = 12 fastresponse end
   Serial.println();
   
-  DPM.loop(); 
-  DPM.setVoltage(5);
+  DPM.setVoltage(cnt);
 
-  delay(1000);
+  cnt++;
 }
