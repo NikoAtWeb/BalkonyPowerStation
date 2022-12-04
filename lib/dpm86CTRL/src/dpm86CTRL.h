@@ -10,14 +10,15 @@ class dpm86CTRL {
   public:
 
       //dpm86CTRL(HardwareSerial * SerialConnection); // ;
-      dpm86CTRL();
-      void begin();                                   // Begin Serial Connection
-      void setup(int EnPin, int RxPin, int TxPin); // with SoftSerial PIN definition
-      void setup(int EnPin);                         // only enable pin
-      void SetResponse();                                    // read from Bus
-      void setVoltage(int voltage);
-      void setCurrent(int current);                // set voltage of DPM86xx
-      void sendOUT();//(int _voltage);                  // send command to DPM86xx
+      dpm86CTRL();//(int adress);
+      void adress(String adress); 
+      void begin();                                             // Begin Serial Connection
+      void setup(int EnPin, int RxPin, int TxPin);              // with SoftSerial PIN definition
+      void setup(int EnPin);                                    // only enable pin
+      void SetResponse();                                       // read response from Bus
+      void setVoltage(int voltage);                             // set voltage output of DPM86xx
+      void setCurrent(int current);                             // set current output of DPM86xx
+      void sendOUT(String _cmd, String _set, String _value);    // send command to DPM86xx
 
   private:
     int _addr;
@@ -25,7 +26,9 @@ class dpm86CTRL {
     int _TxPin;
     int _EnPin;
     int _voltage, _current;
-    String  _cmd, _v, _sendOut;          String _incomeStr;
+    String  _cmd, _ad, _set, _value, _v, _c, _sendOut;          
+    String _incomeStr;
+    boolean _response;
 };
 
 #endif
