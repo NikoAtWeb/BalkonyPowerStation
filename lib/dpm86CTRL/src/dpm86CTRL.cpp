@@ -2,11 +2,29 @@
 #include "dpm86CTRL.h"
 #include "dpm86config.h"
 
-dpm86CTRL::dpm86CTRL()
-{
-  // define dpm
-  // SoftwareSerial SoftSerial; // Rx = 2; Tx = 3
+#define read  "r"
+#define write  "w"
 
+dpm86CTRL::dpm86CTRL()//(int adress)
+{
+  /*
+  _addr = adress;
+  if (_addr <10)
+  {
+    _ad = "0" + String(_addr);
+  }
+  else
+  {
+    _ad = String(_addr);
+  }*/
+
+}
+  //
+  // ====================================================================================
+  //
+void dpm86CTRL::adress(String adress)
+{
+  _ad = adress;
 }
   //
   // ====================================================================================
@@ -57,6 +75,8 @@ void dpm86CTRL::SetResponse()
     debugSerialPrint("Receive: ");
     debugSerialPrintln(_incomeStr);
 
+    _response = true; // income complete
+
   } //end while
 } // end loop
   //
@@ -65,10 +85,21 @@ void dpm86CTRL::SetResponse()
 void dpm86CTRL::setVoltage(int voltage)
 { 
   _voltage = voltage;
-  // ++++++++++++++++++++++++++++++++++++++++++++++++++++
-  sendOUT();
-  SetResponse();
-  // ++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+  _v = String(_voltage*100);
+
+  // ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+  sendOUT(write, "10", _v);
+
+    // ++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+  while (_response == false){
+    SetResponse();
+  }
+  _response = false;
+
+  // ++++++++++++++++++++++++++++++++++++++++++++++++++++++
 }
   //
   // ====================================================================================
@@ -76,22 +107,32 @@ void dpm86CTRL::setVoltage(int voltage)
 void dpm86CTRL::setCurrent(int current)
 { 
   _current = current;
-  // ++++++++++++++++++++++++++++++++++++++++++++++++++++
-  //sendOUT();
-  //SetResponse();
+
+   _c = String(_current*100);
+
+  // ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+  sendOUT(write, "11", _c);
+
+    // ++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+  while (_response == false){
+    SetResponse();
+  }
+  _response = false;
+  
   // ++++++++++++++++++++++++++++++++++++++++++++++++++++
 }
   //
   // ====================================================================================
   //
-void dpm86CTRL::sendOUT()//(int _voltage)
+void dpm86CTRL::sendOUT(String _cmd, String _set, String _value)//(int _voltage)
 { // command address write volt = 12 fastresponse end
   // Example: :01w10=1200.\n
 
-  _cmd  = ":";
-  _addr = 01;
-  _v    =  String(_voltage*100);
-  _sendOut = _cmd + "01" + "w" +"10="+_v + "." + "\n";
+  String _start  = ":";
+
+  _sendOut = _start + _ad + _cmd + _set + "=" + _value + "." + "\n";
   
   // print on Debug Port
   debugSerialPrint("Send Command to DPM86: ");

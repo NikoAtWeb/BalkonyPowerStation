@@ -20,8 +20,9 @@ int cnt = 5;
 
 void setup() {
   Serial.begin(9600);//(115200);
-  DPM.setup(7); // define Pins here
-  DPM.begin();  // start Serial connection
+  DPM.adress("01"); // define Adress here
+  DPM.setup(7);     // define Pins here
+  DPM.begin();      // start Serial connection
 }
 
 void loop() {
@@ -40,4 +41,6 @@ void loop() {
   DPM.setVoltage(cnt);
 
   cnt++;
+
+  DPM.setCurrent(1);
 }
