@@ -15,9 +15,12 @@ class dpm86CTRL {
       void begin();                                             // Begin Serial Connection
       void setup(int EnPin, int RxPin, int TxPin);              // with SoftSerial PIN definition
       void setup(int EnPin);                                    // only enable pin
-      void SetResponse();                                       // read response from Bus
+      String SetResponse();                                       // read response from Bus
       void setVoltage(int voltage);                             // set voltage output of DPM86xx
       void setCurrent(int current);                             // set current output of DPM86xx
+      float readVoltage();
+      float readCurrent();
+      float readTemp();
       void sendOUT(String _cmd, String _set, String _value);    // send command to DPM86xx
 
   private:
