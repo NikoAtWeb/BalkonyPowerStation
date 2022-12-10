@@ -27,7 +27,7 @@ void setup() {
 }
 
 void loop() {
- 
+ DPM.handle();
  if (cnt >12)
  {
     cnt = 5; 
@@ -40,6 +40,11 @@ void loop() {
   Serial.println();
   
   DPM.setVoltage(cnt);
+
+  delay(500);
+
+  Serial.print("Read Voltage: ");
+  DPM.readCurrent();
 
   cnt++;
 

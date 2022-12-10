@@ -7,7 +7,6 @@
 
 dpm86CTRL::dpm86CTRL()//(int adress)
 {
-    //_response = true; // needs to check code
   /*
   _addr = adress;
   if (_addr <10)
@@ -62,6 +61,24 @@ void dpm86CTRL::setup(int EnPin)
   //
   // ====================================================================================
   //
+void dpm86CTRL::handle()
+{
+  int _period = 100;
+
+  SetResponse();
+
+  if(((unsigned long)(millis() - _time_now) > _period) && (_response == false))
+    {
+        _time_now = millis();
+        debugSerialPrintln("An error accured!");
+        _response = true;
+    }
+    
+    //Run other code
+}
+  //
+  // ====================================================================================
+  //
 void dpm86CTRL::setVoltage(int voltage)
 { 
   _voltage = voltage;
@@ -71,13 +88,6 @@ void dpm86CTRL::setVoltage(int voltage)
   // ++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
   sendOUT(write, "10", _v);
-
-    // ++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-  while (_response == false){
-    SetResponse();
-  }
-  _response = false;
 
   // ++++++++++++++++++++++++++++++++++++++++++++++++++++++
 }
@@ -94,13 +104,6 @@ void dpm86CTRL::setCurrent(int current)
 
   sendOUT(write, "11", _c);
 
-    // ++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-  while (_response == false){
-    SetResponse();
-  }
-  _response = false;
-  
   // ++++++++++++++++++++++++++++++++++++++++++++++++++++
 }
   //
@@ -115,7 +118,7 @@ float dpm86CTRL::readVoltage()
   while (_response == false){
     SetResponse();
   }
-  _response = false;
+  _response = true;
   return 0; // test
   // ++++++++++++++++++++++++++++++++++++++++++++++++++++
 }
@@ -131,7 +134,7 @@ float dpm86CTRL::readCurrent()
   while (_response == false){
     SetResponse();
   }
-  _response = false;
+  _response = true;
   return 0; // test
   // ++++++++++++++++++++++++++++++++++++++++++++++++++++
 }
@@ -142,19 +145,19 @@ float dpm86CTRL::readTemp()
 {
   sendOUT(read, "33", "0");
 
+  _response == false;
   // ++++++++++++++++++++++++++++++++++++++++++++++++++++
 
   while (_response == false){
     SetResponse();
   }
-  _response = false;
 
   // ++++++++++++++++++++++++++++++++++++++++++++++++++++
   String _valResp = _incomeStr;
 
   _valResp.remove(0,7); // remove 5 character starting from 1
   debugSerialPrint("Raw answer of temperature: ");
-  debugSerialPrintln(_valResp);
+  debugSerialPrintln(_incomeStr);
   //_valResp = "14.2653"; // für den Test; wird gelöscht
   float _ValOut = _valResp.toFloat();
   return _ValOut; // test
@@ -216,6 +219,10 @@ void dpm86CTRL::sendOUT(String _cmd, String _set, String _value)//(int _voltage)
   // Stop enable write Pin
 
   digitalWrite(_EnPin, LOW);
+
+  // +++++++++++++++++++++++++++++++++++++++++++++++++
+  // make waiting for response
+  _response = false;
 
   // +++++++++++++++++++++++++++++++++++++++++++++++++
 }
