@@ -7,6 +7,7 @@
 
 dpm86CTRL::dpm86CTRL()//(int adress)
 {
+    //_response = true; // needs to check code
   /*
   _addr = adress;
   if (_addr <10)
@@ -151,18 +152,18 @@ float dpm86CTRL::readTemp()
   // ++++++++++++++++++++++++++++++++++++++++++++++++++++
   String _valResp = _incomeStr;
 
-  _valResp.remove(1,5); // remove 5 character starting from 1
-
-  _valResp = "14.2653"; // für den Test; wird gelöscht
-  float _ValOut = _value.toFloat();
-
+  _valResp.remove(0,7); // remove 5 character starting from 1
+  debugSerialPrint("Raw answer of temperature: ");
+  debugSerialPrintln(_valResp);
+  //_valResp = "14.2653"; // für den Test; wird gelöscht
+  float _ValOut = _valResp.toFloat();
   return _ValOut; // test
   // ++++++++++++++++++++++++++++++++++++++++++++++++++++
 }
   //
   // ====================================================================================
   //
-  String dpm86CTRL::SetResponse()
+  void dpm86CTRL::SetResponse()
 {
   // read incoming message and print it on debug port
     while(dpmSerialSoft.available( ) > 0) //  It will only send data when the received data is greater than 0.  
