@@ -18,6 +18,9 @@ class dpm86CTRL {
       void SetResponse();                                       // read response from Bus
       void setVoltage(int voltage);                             // set voltage output of DPM86xx
       void setCurrent(int current);                             // set current output of DPM86xx
+      float readVoltage();
+      float readCurrent();
+      float readTemp();
       void sendOUT(String _cmd, String _set, String _value);    // send command to DPM86xx
 
   private:
@@ -29,6 +32,7 @@ class dpm86CTRL {
     String  _cmd, _ad, _set, _value, _v, _c, _sendOut;          
     String _incomeStr;
     boolean _response;
+    unsigned long _tmr = 0;;
 };
 
 #endif

@@ -12,6 +12,7 @@ dpm86CTRL DPM;
 // Variables
 
 int cnt = 5;
+float t_act = 80;;
 
 // ++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -27,7 +28,7 @@ void setup() {
 
 void loop() {
  
- if (cnt >=12)
+ if (cnt >12)
  {
     cnt = 5; 
  }
@@ -42,5 +43,16 @@ void loop() {
 
   cnt++;
 
+  delay(1000);
+
   DPM.setCurrent(1);
+
+  delay(500);
+
+  t_act = DPM.readTemp();
+
+  Serial.print("Temperature is: ");
+  Serial.print(t_act);
+  Serial.println("°C");
+
 }

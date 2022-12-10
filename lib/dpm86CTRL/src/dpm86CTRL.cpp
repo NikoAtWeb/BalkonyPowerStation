@@ -7,6 +7,7 @@
 
 dpm86CTRL::dpm86CTRL()//(int adress)
 {
+    //_response = true; // needs to check code
   /*
   _addr = adress;
   if (_addr <10)
@@ -61,27 +62,6 @@ void dpm86CTRL::setup(int EnPin)
   //
   // ====================================================================================
   //
-void dpm86CTRL::SetResponse()
-{
-  // read incoming message and print it on debug port
-    while(dpmSerialSoft.available( ) > 0) //  It will only send data when the received data is greater than 0.  
-  {  
-    // ++++++++++ READ incoming Message +++++++++++++++
-
-    _incomeStr = dpmSerialSoft.readString();
-
-    //++++++++++ debug incoming Message +++++++++++++++
-    
-    debugSerialPrint("Receive: ");
-    debugSerialPrintln(_incomeStr);
-
-    _response = true; // income complete
-
-  } //end while
-} // end loop
-  //
-  // ====================================================================================
-  //
 void dpm86CTRL::setVoltage(int voltage)
 { 
   _voltage = voltage;
@@ -123,6 +103,84 @@ void dpm86CTRL::setCurrent(int current)
   
   // ++++++++++++++++++++++++++++++++++++++++++++++++++++
 }
+  //
+  // ====================================================================================
+  //
+float dpm86CTRL::readVoltage()
+{
+  sendOUT(read, "30", "0");
+
+    // ++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+  while (_response == false){
+    SetResponse();
+  }
+  _response = false;
+  return 0; // test
+  // ++++++++++++++++++++++++++++++++++++++++++++++++++++
+}
+  //
+  // ====================================================================================
+  //
+float dpm86CTRL::readCurrent()
+{
+  sendOUT(read, "31", "0");
+
+    // ++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+  while (_response == false){
+    SetResponse();
+  }
+  _response = false;
+  return 0; // test
+  // ++++++++++++++++++++++++++++++++++++++++++++++++++++
+}
+  //
+  // ====================================================================================
+  //
+float dpm86CTRL::readTemp()
+{
+  sendOUT(read, "33", "0");
+
+  // ++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+  while (_response == false){
+    SetResponse();
+  }
+  _response = false;
+
+  // ++++++++++++++++++++++++++++++++++++++++++++++++++++
+  String _valResp = _incomeStr;
+
+  _valResp.remove(0,7); // remove 5 character starting from 1
+  debugSerialPrint("Raw answer of temperature: ");
+  debugSerialPrintln(_valResp);
+  //_valResp = "14.2653"; // für den Test; wird gelöscht
+  float _ValOut = _valResp.toFloat();
+  return _ValOut; // test
+  // ++++++++++++++++++++++++++++++++++++++++++++++++++++
+}
+  //
+  // ====================================================================================
+  //
+  void dpm86CTRL::SetResponse()
+{
+  // read incoming message and print it on debug port
+    while(dpmSerialSoft.available( ) > 0) //  It will only send data when the received data is greater than 0.  
+  {  
+    // ++++++++++ READ incoming Message +++++++++++++++
+
+    _incomeStr = dpmSerialSoft.readString();
+
+    //++++++++++ debug incoming Message +++++++++++++++
+    
+    debugSerialPrint("Receive: ");
+    debugSerialPrintln(_incomeStr);
+
+    _response = true; // income complete
+
+  } //end while
+} // end loop
   //
   // ====================================================================================
   //
