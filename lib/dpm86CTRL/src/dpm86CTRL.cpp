@@ -79,14 +79,17 @@ void dpm86CTRL::handle()
   //
   // ====================================================================================
   //
-String dpm86CTRL::readFromBus()
-{ debugSerialPrintln("start reading from BUS");
+void dpm86CTRL::readResponse()
+{ 
+  //debugSerialPrintln("+++++++++++++++++++++++++++++++");
+  //debugSerialPrintln("+++++++++++++++++++++++++++++++");
+  //debugSerialPrintln("start reading response from BUS");
   // === read incoming message and print it on debug port ================================
   int _period = 150;                            // Answer timer period
   boolean _strComplete = false;                 // status bit
 
   _tmr = millis();                              // set timer to actual time
-  _incomeStr = "";                              // delete last String
+  String _StrIncome = "";                              // delete last String
 
   while(((unsigned long)(millis()) - _tmr < _period) && (_strComplete == false))
   { 
@@ -100,18 +103,21 @@ String dpm86CTRL::readFromBus()
       
       if (_inChar == '\n')                       // if the incoming character is a newline, set a flag
       {
+        //debugSerialPrintln("=============================================");
+        //debugSerialPrint("Raw receive is: ");    // debug message
+        //debugSerialPrintln(_StrIncome);          // debug message
         _strComplete = true;                     // stop the while
-        debugSerialPrint("Raw receive is: ");    // debug message
-        debugSerialPrintln(_inChar);             // debug message
       } // end if
       else // write to income string
       {
-        _incomeStr += _inChar;                   // add it to the inputString
+        _StrIncome += _inChar;                   // add it to the inputString
       } // end else
     } //end while serial available
   } //end while
-
-return _incomeStr;
+  
+  //debugSerialPrintln("+++++++++++++++++++++++++++++++");
+  _incomeStr = _StrIncome;
+  //return "hello"; //_StrIncome;
 
 }
   //
@@ -262,8 +268,9 @@ void dpm86CTRL::sendOUT(String _cmd, String _set, String _value)//(int _voltage)
   digitalWrite(_EnPin, LOW);
 
   // +++++++++++++++++++++++++++++++++++++++++++++++++
-
+_tmr = millis(); 
   // === read incoming message and print it on debug port ================================
+  /*
   int _period = 150;                            // Answer timer period
   boolean _strComplete = false;                 // status bit
 
@@ -293,10 +300,11 @@ void dpm86CTRL::sendOUT(String _cmd, String _set, String _value)//(int _voltage)
       } // end else
     } //end while serial available
   } //end while
-
+*/
   // ===== check the answer =====
-
+  readResponse();
   String _ChkResp = _incomeStr;
+  //String _ChkResp = "";
   String _ChkOut  = _sendOut;
 
   _ChkResp.trim(); // cut empty chars
