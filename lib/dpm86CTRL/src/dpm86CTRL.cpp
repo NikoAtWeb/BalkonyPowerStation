@@ -2,12 +2,11 @@
 #include "dpm86CTRL.h"
 #include "dpm86config.h"
 
-#define read  "r"
-#define write  "w"
+#define _read  "r"
+#define _write  "w"
 
 dpm86CTRL::dpm86CTRL()//(int adress)
 {
-    //_response = true; // needs to check code
   /*
   _addr = adress;
   if (_addr <10)
@@ -62,6 +61,103 @@ void dpm86CTRL::setup(int EnPin)
   //
   // ====================================================================================
   //
+void dpm86CTRL::handle()
+{
+  //int _period = 100;
+
+  //SetResponse();
+/*
+  if(((unsigned long)(millis() - _time_now) > _period) && (_response == false))
+    {
+        _time_now = millis();
+        debugSerialPrintln("An error accured!");
+        _response = true;
+    }
+    */
+    //Run other code
+}
+  //
+  // ====================================================================================
+  //
+void dpm86CTRL::readResponse()
+{ 
+  //debugSerialPrintln("+++++++++++++++++++++++++++++++");
+  //debugSerialPrintln("+++++++++++++++++++++++++++++++");
+  //debugSerialPrintln("start reading response from BUS");
+  // === read incoming message and print it on debug port ================================
+  int _period = 150;                            // Answer timer period
+  boolean _strComplete = false;                 // status bit
+
+  _tmr = millis();                              // set timer to actual time
+  String _StrIncome = "";                              // delete last String
+
+  while(((unsigned long)(millis()) - _tmr < _period) && (_strComplete == false))
+  { 
+    // ========= reading income ===========
+
+    while(dpmSerialSoft.available( ) > 0) //  read  
+    {  
+      // ++++++++++ READ incoming Message +++++++++++++++
+
+      char _inChar = (char)dpmSerialSoft.read(); // read character from BUS
+      
+      if (_inChar == '\n')                       // if the incoming character is a newline, set a flag
+      {
+        //debugSerialPrintln("=============================================");
+        //debugSerialPrint("Raw receive is: ");    // debug message
+        //debugSerialPrintln(_StrIncome);          // debug message
+        _strComplete = true;                     // stop the while
+      } // end if
+      else // write to income string
+      {
+        _StrIncome += _inChar;                   // add it to the inputString
+      } // end else
+    } //end while serial available
+  } //end while
+  
+  //debugSerialPrintln("+++++++++++++++++++++++++++++++");
+   _incomeStr = _StrIncome;
+  //return "hello"; //_StrIncome;
+
+}
+  //
+  // ====================================================================================
+  //
+void dpm86CTRL::SetResponse()
+{
+  String _ChkResp = _incomeStr;
+  //String _ChkResp = "";
+  String _ChkOut  = _sendOut;
+
+  _ChkResp.trim(); // cut empty chars
+  _ChkOut.trim(); // cut empty chars
+
+  debugSerialPrint("Clear Response: ");
+  debugSerialPrintln(_ChkResp);
+
+  // remove response character
+  _ChkResp.remove(6,5);
+  _ChkOut.remove(6,5);
+
+  // ++++++++++++ now check answer ++++++++++++++++++++++++++++++
+
+  if (_ChkResp == ":" + _ad + "ok")
+  {
+    debugSerialPrintln("Sendout: Checked and OK");
+    
+  } // end if
+  else if (_ChkResp == _ChkOut)
+  {
+        debugSerialPrintln("Read; Checked and OK");
+  }
+  else
+  {
+    debugSerialPrintln("Communication error!");
+  }// end else */
+}
+  //
+  // ====================================================================================
+  //
 void dpm86CTRL::setVoltage(int voltage)
 { 
   _voltage = voltage;
@@ -70,14 +166,7 @@ void dpm86CTRL::setVoltage(int voltage)
 
   // ++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-  sendOUT(write, "10", _v);
-
-    // ++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-  while (_response == false){
-    SetResponse();
-  }
-  _response = false;
+  sendOUT(_write, "10", _v);
 
   // ++++++++++++++++++++++++++++++++++++++++++++++++++++++
 }
@@ -92,15 +181,8 @@ void dpm86CTRL::setCurrent(int current)
 
   // ++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-  sendOUT(write, "11", _c);
+  sendOUT(_write, "11", _c);
 
-    // ++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-  while (_response == false){
-    SetResponse();
-  }
-  _response = false;
-  
   // ++++++++++++++++++++++++++++++++++++++++++++++++++++
 }
   //
@@ -108,15 +190,18 @@ void dpm86CTRL::setCurrent(int current)
   //
 float dpm86CTRL::readVoltage()
 {
-  sendOUT(read, "30", "0");
+  sendOUT(_read, "30", "0");
 
     // ++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-  while (_response == false){
-    SetResponse();
-  }
-  _response = false;
-  return 0; // test
+    String _valResp = _incomeStr;
+
+  _valResp.remove(0,7); // remove 7 character starting from 0
+  debugSerialPrint("Raw answer of voltage: ");
+  debugSerialPrintln(_valResp);//(_incomeStr);
+  //_valResp = "1500"; // für den Test; wird gelöscht
+  float _ValOut = _valResp.toFloat();
+  return _ValOut/100; // test
   // ++++++++++++++++++++++++++++++++++++++++++++++++++++
 }
   //
@@ -124,14 +209,14 @@ float dpm86CTRL::readVoltage()
   //
 float dpm86CTRL::readCurrent()
 {
-  sendOUT(read, "31", "0");
+  sendOUT(_read, "31", "0");
 
     // ++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-  while (_response == false){
+  //while (_response == false){
     SetResponse();
-  }
-  _response = false;
+  //}
+  _response = true;
   return 0; // test
   // ++++++++++++++++++++++++++++++++++++++++++++++++++++
 }
@@ -140,21 +225,20 @@ float dpm86CTRL::readCurrent()
   //
 float dpm86CTRL::readTemp()
 {
-  sendOUT(read, "33", "0");
+  sendOUT(_read, "33", "0");
 
   // ++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-  while (_response == false){
-    SetResponse();
-  }
-  _response = false;
+  //while (_response == false){
+    //SetResponse();
+  //}
 
   // ++++++++++++++++++++++++++++++++++++++++++++++++++++
   String _valResp = _incomeStr;
 
-  _valResp.remove(0,7); // remove 5 character starting from 1
+  _valResp.remove(0,7); // remove 7 character starting from 0
   debugSerialPrint("Raw answer of temperature: ");
-  debugSerialPrintln(_valResp);
+  debugSerialPrintln(_incomeStr);
   //_valResp = "14.2653"; // für den Test; wird gelöscht
   float _ValOut = _valResp.toFloat();
   return _ValOut; // test
@@ -163,27 +247,7 @@ float dpm86CTRL::readTemp()
   //
   // ====================================================================================
   //
-  void dpm86CTRL::SetResponse()
-{
-  // read incoming message and print it on debug port
-    while(dpmSerialSoft.available( ) > 0) //  It will only send data when the received data is greater than 0.  
-  {  
-    // ++++++++++ READ incoming Message +++++++++++++++
 
-    _incomeStr = dpmSerialSoft.readString();
-
-    //++++++++++ debug incoming Message +++++++++++++++
-    
-    debugSerialPrint("Receive: ");
-    debugSerialPrintln(_incomeStr);
-
-    _response = true; // income complete
-
-  } //end while
-} // end loop
-  //
-  // ====================================================================================
-  //
 void dpm86CTRL::sendOUT(String _cmd, String _set, String _value)//(int _voltage)
 { // command address write volt = 12 fastresponse end
   // Example: :01w10=1200.\n
@@ -193,6 +257,8 @@ void dpm86CTRL::sendOUT(String _cmd, String _set, String _value)//(int _voltage)
   _sendOut = _start + _ad + _cmd + _set + "=" + _value + "." + "\n";
   
   // print on Debug Port
+  debugSerialPrintln("=============================================");
+  debugSerialPrintln("");
   debugSerialPrint("Send Command to DPM86: ");
   debugSerialPrintln(_sendOut);
 
@@ -202,10 +268,9 @@ void dpm86CTRL::sendOUT(String _cmd, String _set, String _value)//(int _voltage)
   digitalWrite(_EnPin, HIGH);
 
   // +++++++++++++++++++++++++++++++++++++++++++++++++
-  // Send to MAX485
 
 #ifdef HARDWARE_SERIAL_ENABLE
-    dpmSerialHard.flush;
+    dpmSerialHard.flush();
     dpmSerialHard.print(_sendOut);
 #else
     dpmSerialSoft.flush();
@@ -218,4 +283,14 @@ void dpm86CTRL::sendOUT(String _cmd, String _set, String _value)//(int _voltage)
   digitalWrite(_EnPin, LOW);
 
   // +++++++++++++++++++++++++++++++++++++++++++++++++
+  _tmr = millis(); 
+
+  // ===== check the answer =====
+  readResponse();
+  SetResponse();
+  
+
+  debugSerialPrint("How long Send-> Answer needs: ");
+  debugSerialPrintln(millis()-_tmr);
+
 }
