@@ -22,6 +22,7 @@ class dpm86CTRL {
       float readVoltage();
       float readCurrent();
       float readTemp();
+      String readFromBus();
       void sendOUT(String _cmd, String _set, String _value);    // send command to DPM86xx
 
   private:

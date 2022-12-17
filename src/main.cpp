@@ -12,7 +12,8 @@ dpm86CTRL DPM;
 // Variables
 
 int cnt = 5;
-float t_act = 80;;
+float t_act = 80;
+float v_act = 0;
 
 // ++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -24,6 +25,7 @@ void setup() {
   DPM.adress("01"); // define Adress here
   DPM.setup(7);     // define Pins here
   DPM.begin();      // start Serial connection
+  DPM.setVoltage(3);
 }
 
 void loop() {
@@ -33,26 +35,30 @@ void loop() {
     cnt = 5; 
  }
  
-  delay(2000);
+  delay(500);
 
   Serial.print("Communication: ");
   Serial.print("Set Voltage Over Libary"); //command address write volt = 12 fastresponse end
   Serial.println();
   
   DPM.setVoltage(cnt);
-
-  delay(500);
-
-  Serial.print("Read Voltage: ");
-  DPM.readCurrent();
-
   cnt++;
 
-  delay(1000);
+
+  delay(5000);
+
+  v_act = DPM.readVoltage();
+
+  Serial.print("Voltage is: ");
+  Serial.print(v_act);
+  Serial.println("V");
+/*
+
+  delay(5000);
 
   DPM.setCurrent(1);
 
-  delay(500);
+  delay(5000); */
 
   t_act = DPM.readTemp();
 
