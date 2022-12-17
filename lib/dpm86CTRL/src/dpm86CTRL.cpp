@@ -116,9 +116,44 @@ void dpm86CTRL::readResponse()
   } //end while
   
   //debugSerialPrintln("+++++++++++++++++++++++++++++++");
-  _incomeStr = _StrIncome;
+   _incomeStr = _StrIncome;
   //return "hello"; //_StrIncome;
 
+}
+  //
+  // ====================================================================================
+  //
+void dpm86CTRL::SetResponse()
+{
+  String _ChkResp = _incomeStr;
+  //String _ChkResp = "";
+  String _ChkOut  = _sendOut;
+
+  _ChkResp.trim(); // cut empty chars
+  _ChkOut.trim(); // cut empty chars
+
+  debugSerialPrint("Clear Response: ");
+  debugSerialPrintln(_ChkResp);
+
+  // remove response character
+  _ChkResp.remove(6,5);
+  _ChkOut.remove(6,5);
+
+  // ++++++++++++ now check answer ++++++++++++++++++++++++++++++
+
+  if (_ChkResp == ":" + _ad + "ok")
+  {
+    debugSerialPrintln("Sendout: Checked and OK");
+    
+  } // end if
+  else if (_ChkResp == _ChkOut)
+  {
+        debugSerialPrintln("Read; Checked and OK");
+  }
+  else
+  {
+    debugSerialPrintln("Communication error!");
+  }// end else */
 }
   //
   // ====================================================================================
@@ -212,27 +247,7 @@ float dpm86CTRL::readTemp()
   //
   // ====================================================================================
   //
-  void dpm86CTRL::SetResponse()
-{ debugSerialPrintln("going into SetResponse.");
-  // read incoming message and print it on debug port
-    while(dpmSerialSoft.available( ) > 0) //  It will only send data when the received data is greater than 0.  
-  {  
-    // ++++++++++ READ incoming Message +++++++++++++++
 
-    _incomeStr = dpmSerialSoft.readString();
-
-    //++++++++++ debug incoming Message +++++++++++++++
-    
-    debugSerialPrint("Receive: ");
-    debugSerialPrintln(_incomeStr);
-
-    _response = true; // income complete
-
-  } //end while
-} // end loop
-  //
-  // ====================================================================================
-  //
 void dpm86CTRL::sendOUT(String _cmd, String _set, String _value)//(int _voltage)
 { // command address write volt = 12 fastresponse end
   // Example: :01w10=1200.\n
@@ -268,70 +283,12 @@ void dpm86CTRL::sendOUT(String _cmd, String _set, String _value)//(int _voltage)
   digitalWrite(_EnPin, LOW);
 
   // +++++++++++++++++++++++++++++++++++++++++++++++++
-_tmr = millis(); 
-  // === read incoming message and print it on debug port ================================
-  /*
-  int _period = 150;                            // Answer timer period
-  boolean _strComplete = false;                 // status bit
+  _tmr = millis(); 
 
-  _tmr = millis();                              // set timer to actual time
-  _incomeStr = "";                              // delete last String
-
-  while(((unsigned long)(millis()) - _tmr < _period) && (_strComplete == false))
-  { 
-    // ========= reading income ===========
-
-    while(dpmSerialSoft.available( ) > 0) //  read  
-    {  
-      // ++++++++++ READ incoming Message +++++++++++++++
-
-      char _inChar = (char)dpmSerialSoft.read(); // read character from BUS
-      
-      if (_inChar == '\n')                       // if the incoming character is a newline, set a flag
-      {
-        debugSerialPrintln("=============================================");
-        debugSerialPrint("Raw receive is: ");    // debug message
-        debugSerialPrintln(_incomeStr);          // debug message
-        _strComplete = true;                     // stop the while
-      } // end if
-      else // write to income string
-      {
-        _incomeStr += _inChar;                   // add it to the inputString
-      } // end else
-    } //end while serial available
-  } //end while
-*/
   // ===== check the answer =====
   readResponse();
-  String _ChkResp = _incomeStr;
-  //String _ChkResp = "";
-  String _ChkOut  = _sendOut;
-
-  _ChkResp.trim(); // cut empty chars
-  _ChkOut.trim(); // cut empty chars
-
-  debugSerialPrint("Clear Response: ");
-  debugSerialPrintln(_ChkResp);
-
-  // remove response character
-  _ChkResp.remove(6,5);
-  _ChkOut.remove(6,5);
-
-  // ++++++++++++ now check answer ++++++++++++++++++++++++++++++
-
-  if (_ChkResp == _start + _ad + "ok")
-  {
-    debugSerialPrintln("Sendout: Checked and OK");
-    
-  } // end if
-  else if (_ChkResp == _ChkOut)
-  {
-        debugSerialPrintln("Read; Checked and OK");
-  }
-  else
-  {
-    debugSerialPrintln("Communication error!");
-  }// end else */
+  SetResponse();
+  
 
   debugSerialPrint("How long Send-> Answer needs: ");
   debugSerialPrintln(millis()-_tmr);
