@@ -24,12 +24,15 @@ float v_act = 0;
 void t_hrCallback();
 void t_minCallback();
 void t_sCallback();
+void t_100msCallback();
+
 
 //Tasks
 
 Task t_hr(3600000, TASK_FOREVER, &t_hrCallback);
 Task t_min(60000, TASK_FOREVER, &t_minCallback);
 Task t_s(1000, TASK_FOREVER, &t_sCallback);
+Task t_100ms(100, TASK_FOREVER, &t_sCallback);
 
 Scheduler runner;
 
@@ -72,6 +75,16 @@ void t_sCallback()
 
 }
 
+void t_100msCallback() 
+{
+  //Serial.println("");
+  //Serial.println(" +++++++++++ Start 100ms - Task +++++++++++++++++++++");
+  
+  //Serial.println("");
+  //Serial.println(" +++++++++++ End 100ms - Task +++++++++++++++++++++++");
+
+}
+
 // ++++++++++++++++++++++++++++++++++++++++++++++++++++
 // Setup
 
@@ -97,6 +110,9 @@ void setup() {
   runner.addTask(t_s); // add Task
   Serial.println("added t_s");
 
+  runner.addTask(t_100ms); // add Task
+  Serial.println("added t_100ms");
+
   delay(1000);
   
   // enable tasks
@@ -106,6 +122,8 @@ void setup() {
   Serial.println("Enable t_min");
   t_s.enable();
   Serial.println("Enable t_s");
+  t_100ms.enable();
+  Serial.println("Enable t_100ms");
 
 }
 
