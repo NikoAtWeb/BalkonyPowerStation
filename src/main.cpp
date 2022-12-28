@@ -20,51 +20,44 @@ float v_act = 0;
 // Tasks
 
 // Callback methods prototypes
-//void t1Callback();
-void t2Callback();
-void t3Callback();
+
+void tFastCallback();
+void tSlowCallback();
 
 //Tasks
-//Task t1(2000, 10, &t1Callback);
-Task t2(1000, TASK_FOREVER, &t2Callback);
-Task t3(2000, TASK_FOREVER, &t3Callback);
+
+Task tFast(1000, TASK_FOREVER, &tFastCallback);
+Task tSlow(5000, TASK_FOREVER, &tSlowCallback);
 
 Scheduler runner;
 
-/*
-void t1Callback() {
-    Serial.print("t1: ");
-    Serial.println(millis());
-    
-    if (t1.isFirstIteration()) {
-      runner.addTask(t3);
-      t3.enable();
-      Serial.println("t1: enabled t3 and added to the chain");
-    }
-    
-    if (t1.isLastIteration()) {
-      t3.disable();
-      runner.deleteTask(t3);
-      t2.setInterval(500);
-      Serial.println("t1: disable t3 and delete it from the chain. t2 interval set to 500");
-    }
-}*/
+void tFastCallback() {
 
-void t2Callback() {
-
-  Serial.println("Task2");
+  Serial.println("");
+  Serial.println(" +++++++++++ Start Fast - Task +++++++++++++++++++++");
 
   DPM.setVoltage(cnt);
 
   cnt++;
-    
+  
+  Serial.println("");
+  Serial.println(" +++++++++++ End Fast - Task +++++++++++++++++++++++");
 }
 
-void t3Callback() {
+void tSlowCallback() 
+{
+  Serial.println("");
+  Serial.println(" +++++++++++ Start Slow - Task +++++++++++++++++++++");
 
-    Serial.print("++++++++++++++++++++++++++++++++++++++++++++++++++++ Task 3: ");
-    Serial.println(millis());
+  t_act = DPM.readTemp();
+
+  Serial.print("Temperature is: ");
+  Serial.print(t_act);
+  Serial.println("°C");
   
+  Serial.println("");
+  Serial.println(" +++++++++++ End Slow - Task +++++++++++++++++++++++");
+
 }
 
 // ++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -80,30 +73,27 @@ void setup() {
   DPM.setVoltage(3);
 
   // Tasks
-    runner.init();
+  runner.init(); // init runner
   Serial.println("Initialized scheduler");
   
-  //runner.addTask(t1);
-  //Serial.println("added t1");
-  
-  runner.addTask(t2);
-  Serial.println("added t2");
+  runner.addTask(tFast); // add Task
+  Serial.println("added tFast");
 
-  runner.addTask(t3);
-  Serial.println("added t3");
+  runner.addTask(tSlow); // add Task
+  Serial.println("added tSlow");
 
   delay(1000);
   
-  //t1.enable();
-  //Serial.println("Enabled t1");
-  t2.enable();
-  Serial.println("Enabled t2");
-  t3.enable();
-  Serial.println("Enable t3");
+  // enable tasks
+  tFast.enable(); 
+  Serial.println("Enabled tFast");
+  tSlow.enable();
+  Serial.println("Enable tSlow");
 
 }
 
 void loop() {
+  
   runner.execute();
   DPM.handle();
   if (cnt >12)
