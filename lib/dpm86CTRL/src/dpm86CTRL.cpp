@@ -158,11 +158,11 @@ void dpm86CTRL::SetResponse()
   //
   // ====================================================================================
   //
-void dpm86CTRL::setVoltage(int voltage)
+void dpm86CTRL::setVoltage(float voltage)
 { 
   _voltage = voltage;
-
-  _v = String(_voltage*100);
+  int _vINT = _voltage*100;     // DPM format: 12.45V = 1245
+  _v = String((int)(_voltage*100));
 
   // ++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -173,11 +173,10 @@ void dpm86CTRL::setVoltage(int voltage)
   //
   // ====================================================================================
   //
-void dpm86CTRL::setCurrent(int current)
+void dpm86CTRL::setCurrent(float current)
 { 
   _current = current;
-
-   _c = String(_current*100);
+  _c = String((int)(_current*1000));
 
   // ++++++++++++++++++++++++++++++++++++++++++++++++++++++
 

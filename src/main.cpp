@@ -10,11 +10,22 @@ SoftwareSerial SoftSerial(2,3); // Rx = 2; Tx = 3
 dpm86CTRL DPM;
 
 // ++++++++++++++++++++++++++++++++++++++++++++++++++++
+// defines
+
+#define c_lim  15 // maximum current
+
+// ++++++++++++++++++++++++++++++++++++++++++++++++++++
 // Variables
 
 int cnt = 5;
 float t_act = 80;
 float v_act = 0;
+
+float v_batt = 24;
+float p_grid_act = 250;
+float c_grid_act = 0;
+float c_BatOut = 0;
+float c_tar_raw = 0;
 
 // ++++++++++++++++++++++++++++++++++++++++++++++++++++
 // Tasks
@@ -32,7 +43,7 @@ void t_100msCallback();
 Task t_hr(3600000, TASK_FOREVER, &t_hrCallback);
 Task t_min(60000, TASK_FOREVER, &t_minCallback);
 Task t_s(1000, TASK_FOREVER, &t_sCallback);
-Task t_100ms(100, TASK_FOREVER, &t_sCallback);
+Task t_100ms(100, TASK_FOREVER, &t_100msCallback);
 
 Scheduler runner;
 
@@ -41,9 +52,10 @@ void t_hrCallback() {
   Serial.println("");
   Serial.println(" +++++++++++ Start Hr - Task +++++++++++++++++++++");
 
-  DPM.setVoltage(cnt);
+  // Ask weather
+  // Ask Time
+  // do the enviroment stuff: sunrise/sunset, cloudiness(%), temperature ==> generate env-status
 
-  cnt++;
   
   Serial.println("");
   Serial.println(" +++++++++++ End Hr - Task +++++++++++++++++++++++");
@@ -53,12 +65,25 @@ void t_minCallback()
 {
   Serial.println("");
   Serial.println(" +++++++++++ Start min - Task +++++++++++++++++++++");
+  
+  // +++++ Check devices +++++++++++++++++++++++++++++++++++++++++++++
+  
+  // check the >DPM< 
 
   t_act = DPM.readTemp();
 
   Serial.print("Temperature is: ");
   Serial.print(t_act);
   Serial.println("°C");
+
+  // check the battery
+
+  // battery-stuff: read voltage, temperature and health ==> make forcast (max W) out of battery-level until next sun (env-status)
+  v_batt = 25 - cnt;
+  cnt--;
+  Serial.print("Battery voltage is: ");
+  Serial.print(v_batt);
+  Serial.println("V");
   
   Serial.println("");
   Serial.println(" +++++++++++ End min - Task +++++++++++++++++++++++");
@@ -69,7 +94,26 @@ void t_sCallback()
 {
   //Serial.println("");
   //Serial.println(" +++++++++++ Start sec - Task +++++++++++++++++++++");
-  
+
+  // read actual power consumption at 230V grid
+
+  p_grid_act = random(200,250);       // write random value to variable
+    //Serial.print("p_grid_act: ");
+    //Serial.println(p_grid_act);
+  c_grid_act = p_grid_act/230;        // P = U*I => I = P/U
+    //Serial.print("c_grid_act: ");
+    //Serial.println(c_grid_act);
+  c_BatOut = p_grid_act/v_batt;           // P = U*I => I = P/U = p_grid / 20V
+    //Serial.print("c_BatOut: ");
+    //Serial.println(c_BatOut);
+
+  c_tar_raw = min(c_BatOut, c_lim); // limit current
+    Serial.print("c_tar_raw: ");
+    Serial.println(c_tar_raw);
+
+  DPM.setVoltage(c_tar_raw);                // A T T E N T I O N: only for Testing at desk control voltage!!!! 
+
+  //cnt++;
   //Serial.println("");
   //Serial.println(" +++++++++++ End sec - Task +++++++++++++++++++++++");
 
@@ -95,7 +139,7 @@ void setup() {
   DPM.adress("01"); // define Adress here
   DPM.setup(7);     // define Pins here
   DPM.begin();      // start Serial connection
-  DPM.setVoltage(3);
+  DPM.setVoltage(3); // start with 3V
 
   // Tasks
   runner.init(); // init runner
@@ -131,7 +175,7 @@ void loop() {
 
   runner.execute();
   DPM.handle();
-  if (cnt >12)
+  if (cnt ==0 )
   {
       cnt = 5; 
   }
