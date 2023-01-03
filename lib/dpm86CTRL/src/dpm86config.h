@@ -17,9 +17,10 @@
  * Define dpmSerial for communicate with dpm86xxx in HardwareSerial or SoftwareSerial. 
  * Comment following define
  */
-//#define HARDWARE_SERIAL_ENABLE
+#define HARDWARE_SERIAL_ENABLE
 
 #ifdef HARDWARE_SERIAL_ENABLE
+    #include <HardwareSerial.h> 
     #define dpmSerialHard Serial2
 #else
     #include <SoftwareSerial.h>

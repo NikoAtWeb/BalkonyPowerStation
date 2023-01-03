@@ -95,25 +95,47 @@ void dpm86CTRL::readResponse()
   { 
     // ========= reading income ===========
 
-    while(dpmSerialSoft.available( ) > 0) //  read  
-    {  
-      // ++++++++++ READ incoming Message +++++++++++++++
+  #ifdef HARDWARE_SERIAL_ENABLE
+    while(dpmSerialHard.available( ) > 0) //  read  
+      {  
+        // ++++++++++ READ incoming Message +++++++++++++++
 
-      char _inChar = (char)dpmSerialSoft.read(); // read character from BUS
-      
-      if (_inChar == '\n')                       // if the incoming character is a newline, set a flag
-      {
-        //debugSerialPrintln("=============================================");
-        //debugSerialPrint("Raw receive is: ");    // debug message
-        //debugSerialPrintln(_StrIncome);          // debug message
-        _strComplete = true;                     // stop the while
-      } // end if
-      else // write to income string
-      {
-        _StrIncome += _inChar;                   // add it to the inputString
-      } // end else
-    } //end while serial available
-  } //end while
+        char _inChar = (char)dpmSerialHard.read(); // read character from BUS
+        
+        if (_inChar == '\n')                       // if the incoming character is a newline, set a flag
+        {
+          //debugSerialPrintln("=============================================");
+          //debugSerialPrint("Raw receive is: ");    // debug message
+          //debugSerialPrintln(_StrIncome);          // debug message
+          _strComplete = true;                     // stop the while
+        } // end if
+        else // write to income string
+        {
+          _StrIncome += _inChar;                   // add it to the inputString
+        } // end else
+      } //end while serial available
+    } //end while
+  #else
+    while(dpmSerialSoft.available( ) > 0) //  read  
+      {  
+        // ++++++++++ READ incoming Message +++++++++++++++
+
+        char _inChar = (char)dpmSerialSoft.read(); // read character from BUS
+        
+        if (_inChar == '\n')                       // if the incoming character is a newline, set a flag
+        {
+          //debugSerialPrintln("=============================================");
+          //debugSerialPrint("Raw receive is: ");    // debug message
+          //debugSerialPrintln(_StrIncome);          // debug message
+          _strComplete = true;                     // stop the while
+        } // end if
+        else // write to income string
+        {
+          _StrIncome += _inChar;                   // add it to the inputString
+        } // end else
+      } //end while serial available
+    } //end while
+  #endif
   
   //debugSerialPrintln("+++++++++++++++++++++++++++++++");
    _incomeStr = _StrIncome;

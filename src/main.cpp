@@ -1,12 +1,14 @@
 #include <Arduino.h>
-//#include <Esp.h> // ESP Integration
+#include <Esp.h> // ESP Integration
 //#include <SoftwareSerial.h>
+#include <HardwareSerial.h>                   // Lade Hardware Serial
 #include "dpm86CTRL.h"
 #include <TaskScheduler.h>
 
 // ++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-SoftwareSerial SoftSerial(2,3); // Rx = 2; Tx = 3
+//HardwareSerial Serial(1); // Für die Ausgabe am Serial Monitor
+//HardwareSerial SerialHard(2); // 1 = USB Serial, wir können also 2 oder 3 wählen
+//SoftwareSerial SoftSerial(2,3); // Rx = 2; Tx = 3
 dpm86CTRL DPM;
 
 // ++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -107,7 +109,7 @@ void t_sCallback()
     //Serial.print("c_BatOut: ");
     //Serial.println(c_BatOut);
 
-  c_tar_raw = min(c_BatOut, c_lim); // limit current
+  c_tar_raw = _min(c_BatOut, c_lim); // limit current
     Serial.print("c_tar_raw: ");
     Serial.println(c_tar_raw);
 
@@ -133,7 +135,7 @@ void t_100msCallback()
 // Setup
 
 void setup() {
-  Serial.begin(9600);//(115200);
+  Serial.begin(115200);
 
   // DPM
   DPM.adress("01"); // define Adress here
