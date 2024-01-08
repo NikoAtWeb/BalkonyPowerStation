@@ -132,19 +132,19 @@ void t_100msCallback()
 }
 
 // ++++++++++++++++++++++++++++++++++++++++++++++++++++
-// Setup
+// ========= Setup  ===========
 
 void setup() {
   Serial.begin(115200);
 
-  // DPM
+  // ========= DPM
   DPM.adress("01"); // define Adress here
   DPM.setup(7);     // define Pins here
   DPM.begin();      // start Serial connection
   DPM.setVoltage(3); // start with 3V
 
-  // Tasks
-  runner.init(); // init runner
+  // ========= Tasks  ===========
+  runner.init(); // init runner 
   Serial.println("Initialized scheduler");
   
   runner.addTask(t_hr); // add Task
@@ -161,7 +161,7 @@ void setup() {
 
   delay(1000);
   
-  // enable tasks
+  // ========= enable tasks  ===========
   t_hr.enable(); 
   Serial.println("Enabled t_hr");
   t_min.enable();
@@ -170,6 +170,13 @@ void setup() {
   Serial.println("Enable t_s");
   t_100ms.enable();
   Serial.println("Enable t_100ms");
+
+// ========= Build INFORMATION ===========
+
+  Serial.print("Build Date: ");
+  Serial.println(BUILD_DATE);
+  Serial.print("Build Time: ");
+  Serial.println(BUILD_TIME);
 
 }
 
