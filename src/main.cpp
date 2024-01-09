@@ -139,7 +139,7 @@ void setup() {
 
   // ========= DPM
   DPM.adress("01"); // define Adress here
-  DPM.setup(7);     // define Pins here
+  DPM.setup(21);     // define Pins here
   DPM.begin();      // start Serial connection
   DPM.setVoltage(3); // start with 3V
 
