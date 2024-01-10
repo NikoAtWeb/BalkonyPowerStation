@@ -1,12 +1,14 @@
 #include <Arduino.h>
-//#include <Esp.h> // ESP Integration
+#include <Esp.h> // ESP Integration
 //#include <SoftwareSerial.h>
+#include <HardwareSerial.h>                   // Lade Hardware Serial
 #include "dpm86CTRL.h"
 #include <TaskScheduler.h>
 
 // ++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-SoftwareSerial SoftSerial(2,3); // Rx = 2; Tx = 3
+//HardwareSerial Serial(1); // Für die Ausgabe am Serial Monitor
+//HardwareSerial SerialHard(2); // 1 = USB Serial, wir können also 2 oder 3 wählen
+//SoftwareSerial SoftSerial(2,3); // Rx = 2; Tx = 3
 dpm86CTRL DPM;
 
 // ++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -107,7 +109,7 @@ void t_sCallback()
     //Serial.print("c_BatOut: ");
     //Serial.println(c_BatOut);
 
-  c_tar_raw = min(c_BatOut, c_lim); // limit current
+  c_tar_raw = _min(c_BatOut, c_lim); // limit current
     Serial.print("c_tar_raw: ");
     Serial.println(c_tar_raw);
 
@@ -130,19 +132,19 @@ void t_100msCallback()
 }
 
 // ++++++++++++++++++++++++++++++++++++++++++++++++++++
-// Setup
+// ========= Setup  ===========
 
 void setup() {
-  Serial.begin(9600);//(115200);
+  Serial.begin(115200);
 
-  // DPM
+  // ========= DPM
   DPM.adress("01"); // define Adress here
-  DPM.setup(7);     // define Pins here
+  DPM.setup(21);     // define Pins here
   DPM.begin();      // start Serial connection
   DPM.setVoltage(3); // start with 3V
 
-  // Tasks
-  runner.init(); // init runner
+  // ========= Tasks  ===========
+  runner.init(); // init runner 
   Serial.println("Initialized scheduler");
   
   runner.addTask(t_hr); // add Task
@@ -159,7 +161,7 @@ void setup() {
 
   delay(1000);
   
-  // enable tasks
+  // ========= enable tasks  ===========
   t_hr.enable(); 
   Serial.println("Enabled t_hr");
   t_min.enable();
@@ -168,6 +170,13 @@ void setup() {
   Serial.println("Enable t_s");
   t_100ms.enable();
   Serial.println("Enable t_100ms");
+
+// ========= Build INFORMATION ===========
+
+  Serial.print("Build Date: ");
+  Serial.println(BUILD_DATE);
+  Serial.print("Build Time: ");
+  Serial.println(BUILD_TIME);
 
 }
 

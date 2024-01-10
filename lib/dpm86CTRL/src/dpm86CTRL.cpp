@@ -31,7 +31,7 @@ void dpm86CTRL::adress(String adress)
   //
 void dpm86CTRL::begin()
 {
-  debugSerialBegin(9600);
+  //debugSerialBegin(9600);
   #ifdef HARDWARE_SERIAL_ENABLE
     dpmSerialHard.begin(9600);  // only for HardwareSerial, like ESP32
   #else
@@ -55,8 +55,8 @@ void dpm86CTRL::setup(int _EnPin, int _RxPin, int _TxPin)
 void dpm86CTRL::setup(int EnPin)
 {
   _EnPin = EnPin; // swap to internal variable
-  pinMode(_EnPin, OUTPUT);
-  digitalWrite(_EnPin, LOW);
+  //pinMode(_EnPin, OUTPUT);
+  //digitalWrite(_EnPin, LOW);
 }
   //
   // ====================================================================================
@@ -95,25 +95,47 @@ void dpm86CTRL::readResponse()
   { 
     // ========= reading income ===========
 
-    while(dpmSerialSoft.available( ) > 0) //  read  
-    {  
-      // ++++++++++ READ incoming Message +++++++++++++++
+  #ifdef HARDWARE_SERIAL_ENABLE
+    while(dpmSerialHard.available( ) > 0) //  read  
+      {  
+        // ++++++++++ READ incoming Message +++++++++++++++
 
-      char _inChar = (char)dpmSerialSoft.read(); // read character from BUS
-      
-      if (_inChar == '\n')                       // if the incoming character is a newline, set a flag
-      {
-        //debugSerialPrintln("=============================================");
-        //debugSerialPrint("Raw receive is: ");    // debug message
-        //debugSerialPrintln(_StrIncome);          // debug message
-        _strComplete = true;                     // stop the while
-      } // end if
-      else // write to income string
-      {
-        _StrIncome += _inChar;                   // add it to the inputString
-      } // end else
-    } //end while serial available
-  } //end while
+        char _inChar = (char)dpmSerialHard.read(); // read character from BUS
+        
+        if (_inChar == '\n')                       // if the incoming character is a newline, set a flag
+        {
+          //debugSerialPrintln("=============================================");
+          //debugSerialPrint("Raw receive is: ");    // debug message
+          //debugSerialPrintln(_StrIncome);          // debug message
+          _strComplete = true;                     // stop the while
+        } // end if
+        else // write to income string
+        {
+          _StrIncome += _inChar;                   // add it to the inputString
+        } // end else
+      } //end while serial available
+    } //end while
+  #else
+    while(dpmSerialSoft.available( ) > 0) //  read  
+      {  
+        // ++++++++++ READ incoming Message +++++++++++++++
+
+        char _inChar = (char)dpmSerialSoft.read(); // read character from BUS
+        
+        if (_inChar == '\n')                       // if the incoming character is a newline, set a flag
+        {
+          //debugSerialPrintln("=============================================");
+          //debugSerialPrint("Raw receive is: ");    // debug message
+          //debugSerialPrintln(_StrIncome);          // debug message
+          _strComplete = true;                     // stop the while
+        } // end if
+        else // write to income string
+        {
+          _StrIncome += _inChar;                   // add it to the inputString
+        } // end else
+      } //end while serial available
+    } //end while
+  #endif
   
   //debugSerialPrintln("+++++++++++++++++++++++++++++++");
    _incomeStr = _StrIncome;
@@ -279,7 +301,7 @@ void dpm86CTRL::sendOUT(String _cmd, String _set, String _value)//(int _voltage)
   // ++++++++++++++++++++++++++++++++++++++++++++++++
   // Stop enable write Pin
 
-  digitalWrite(_EnPin, LOW);
+  //digitalWrite(_EnPin, LOW);
 
   // +++++++++++++++++++++++++++++++++++++++++++++++++
   _tmr = millis(); 
