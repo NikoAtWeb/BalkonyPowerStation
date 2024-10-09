@@ -33,7 +33,7 @@ void dpm86CTRL::begin()
 {
   //debugSerialBegin(9600);
   #ifdef HARDWARE_SERIAL_ENABLE
-    dpmSerialHard.begin(9600);  // only for HardwareSerial, like ESP32
+    dpmSerialHard.begin(9600,SERIAL_8N1, 16, 17);  // only for HardwareSerial, like ESP32
   #else
     dpmSerialSoft.begin(9600);    // only for SoftwareSerial, like Arduino Uno
   #endif
@@ -55,8 +55,8 @@ void dpm86CTRL::setup(int _EnPin, int _RxPin, int _TxPin)
 void dpm86CTRL::setup(int EnPin)
 {
   _EnPin = EnPin; // swap to internal variable
-  //pinMode(_EnPin, OUTPUT);
-  //digitalWrite(_EnPin, LOW);
+  pinMode(_EnPin, OUTPUT);
+  digitalWrite(_EnPin, LOW);
 }
   //
   // ====================================================================================
@@ -75,46 +75,39 @@ void dpm86CTRL::handle()
     }
     */
     //Run other code
+    debugSerial.println("warte auf Rückmeldung:");
+      while (dpmSerialHard.available() >0 ) {
+        char receivedChar = dpmSerialHard.read();
+        debugSerial.print("Empfangene Zeichen: ");
+        debugSerial.println(receivedChar);
+    }
 }
   //
   // ====================================================================================
   //
 void dpm86CTRL::readResponse()
 { 
-  //debugSerialPrintln("+++++++++++++++++++++++++++++++");
-  //debugSerialPrintln("+++++++++++++++++++++++++++++++");
-  //debugSerialPrintln("start reading response from BUS");
+  debugSerialPrintln("+++++++++++++++++++++++++++++++");
+  debugSerialPrintln("+++++++++++++++++++++++++++++++");
+  debugSerialPrintln("start reading response from BUS");
   // === read incoming message and print it on debug port ================================
-  int _period = 150;                            // Answer timer period
+  int _period = 999;                            // Answer timer period
   boolean _strComplete = false;                 // status bit
 
   _tmr = millis();                              // set timer to actual time
   String _StrIncome = "";                              // delete last String
 
-  while(((unsigned long)(millis()) - _tmr < _period) && (_strComplete == false))
-  { 
+  //while(((unsigned long)(millis()) - _tmr < _period) && (_strComplete == false))
     // ========= reading income ===========
 
   #ifdef HARDWARE_SERIAL_ENABLE
-    while(dpmSerialHard.available( ) > 0) //  read  
-      {  
-        // ++++++++++ READ incoming Message +++++++++++++++
+      while (dpmSerialHard.available()) {
+        char receivedChar = dpmSerialHard.read();
+        debugSerial.print("Empfangene Zeichen: ");
+        debugSerial.println(receivedChar);
+    }
+      //} //end while serial available
 
-        char _inChar = (char)dpmSerialHard.read(); // read character from BUS
-        
-        if (_inChar == '\n')                       // if the incoming character is a newline, set a flag
-        {
-          //debugSerialPrintln("=============================================");
-          //debugSerialPrint("Raw receive is: ");    // debug message
-          //debugSerialPrintln(_StrIncome);          // debug message
-          _strComplete = true;                     // stop the while
-        } // end if
-        else // write to income string
-        {
-          _StrIncome += _inChar;                   // add it to the inputString
-        } // end else
-      } //end while serial available
-    } //end while
   #else
     while(dpmSerialSoft.available( ) > 0) //  read  
       {  
@@ -137,7 +130,7 @@ void dpm86CTRL::readResponse()
     } //end while
   #endif
   
-  //debugSerialPrintln("+++++++++++++++++++++++++++++++");
+  debugSerialPrintln("+++++++++++++++++++++++++++++++");
    _incomeStr = _StrIncome;
   //return "hello"; //_StrIncome;
 
@@ -301,7 +294,7 @@ void dpm86CTRL::sendOUT(String _cmd, String _set, String _value)//(int _voltage)
   // ++++++++++++++++++++++++++++++++++++++++++++++++
   // Stop enable write Pin
 
-  //digitalWrite(_EnPin, LOW);
+  digitalWrite(_EnPin, LOW);
 
   // +++++++++++++++++++++++++++++++++++++++++++++++++
   _tmr = millis(); 

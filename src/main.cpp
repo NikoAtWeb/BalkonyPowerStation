@@ -1,7 +1,7 @@
 #include <Arduino.h>
-#include <Esp.h> // ESP Integration
+//#include <Esp.h> // ESP Integration
 //#include <SoftwareSerial.h>
-#include <HardwareSerial.h>                   // Lade Hardware Serial
+//#include <HardwareSerial.h>                   // Lade Hardware Serial
 #include "dpm86CTRL.h"
 #include <TaskScheduler.h>
 
@@ -110,8 +110,8 @@ void t_sCallback()
     //Serial.println(c_BatOut);
 
   c_tar_raw = _min(c_BatOut, c_lim); // limit current
-    Serial.print("c_tar_raw: ");
-    Serial.println(c_tar_raw);
+//    Serial.print("c_tar_raw: ");
+//    Serial.println(c_tar_raw);
 
   DPM.setVoltage(c_tar_raw);                // A T T E N T I O N: only for Testing at desk control voltage!!!! 
 
@@ -183,11 +183,12 @@ void setup() {
 void loop() {
 
   runner.execute();
-  DPM.handle();
-  if (cnt ==0 )
+  //DPM.handle();
+  if (cnt >20 )
   {
       cnt = 5; 
   }
+  cnt++;
  /*
   delay(500);
 

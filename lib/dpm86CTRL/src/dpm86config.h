@@ -20,7 +20,7 @@
 #define HARDWARE_SERIAL_ENABLE
 
 #ifdef HARDWARE_SERIAL_ENABLE
-    #include <HardwareSerial.h> 
+    //#include <HardwareSerial.h> 
     #define dpmSerialHard Serial2
 #else
     #include <SoftwareSerial.h>
